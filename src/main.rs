@@ -4,9 +4,13 @@ use crate::westmint::runtime_types::{
 };
 use sp_keyring::{AccountKeyring, Sr25519Keyring};
 use subxt::{tx::PairSigner, utils::MultiAddress, OnlineClient, SubstrateConfig};
+// derive_for_type(type = "crate::westmint::runtime_types::xcm::v3::multilocation::MultiLocation", derive = "Copy, Clone"),
 
 // #[subxt::subxt(runtime_metadata_url = "wss://westmint-rpc.polkadot.io:443")]
-#[subxt::subxt(runtime_metadata_url = "ws://localhost:9910")]
+#[subxt::subxt(
+    runtime_metadata_url = "ws://localhost:9910",
+    derive_for_all_types = "Clone"
+)]
 pub mod westmint {}
 
 #[tokio::main]
@@ -38,37 +42,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         parents: 0,
         interior: Here,
     };
-    let dot2 = MultiLocation {
-        parents: 0,
-        interior: Here,
-    };
-    let dot3 = MultiLocation {
-        parents: 0,
-        interior: Here,
-    };
-    let dot4 = MultiLocation {
-        parents: 0,
-        interior: Here,
-    };
     let asset1 = MultiLocation {
         parents: 0,
         interior: X2(Junction::PalletInstance(50), Junction::GeneralIndex(1)),
     };
-    let asset1a = MultiLocation {
+    let asset66 = MultiLocation {
         parents: 0,
-        interior: X2(Junction::PalletInstance(50), Junction::GeneralIndex(1)),
+        interior: X2(Junction::PalletInstance(50), Junction::GeneralIndex(66)),
     };
-    let asset1b = MultiLocation {
-        parents: 0,
-        interior: X2(Junction::PalletInstance(50), Junction::GeneralIndex(1)),
-    };
-    let tx = westmint::tx().asset_conversion().create_pool(dot, asset1);
+    let tx = westmint::tx()
+        .asset_conversion()
+        .create_pool(dot.clone(), asset66.clone());
     let _hash = api.tx().sign_and_submit_default(&tx, &signer).await?;
     println!("create pool hash: {:?}", _hash);
 
     let tx = westmint::tx().asset_conversion().add_liquidity(
-        dot2,
-        dot4,
+        dot.clone(),
+        asset1.clone(),
         10_000_000_000,
         100_000_000_000,
         1_000_000_000,
